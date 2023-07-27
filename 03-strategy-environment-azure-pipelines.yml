@@ -1,0 +1,19 @@
+trigger:
+- main
+
+
+
+strategy:
+  matrix: # pozwala na definiowanie wielu konfiguracji/wariacji
+          # podajemy systemy operacyjne jakich chcemy użyć
+    linux:
+      operatingSystem:  ubuntu-latest
+    mac:
+      operatingSystem:  macOS-latest
+
+pool:
+  vmImage: $(operatingSystem) # zamiast hardcodować to dajemy zmienną
+
+steps:
+- script: echo Running on $(operatingSystem)
+  displayName: 'Run a one-line script'
