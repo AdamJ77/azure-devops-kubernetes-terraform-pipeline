@@ -16,7 +16,20 @@ stages:
           - bash: echo $(Build.BuildId)
           - bash: echo $(Build.SourceBranchName)
           - bash: echo $(System.DefaultWorkingDirectory) # pwd
-          - bash: echo $(Build.ArtifactStagingDirectory) # nazwa folderu w którym są przechowywane artefakty stworzone w pipelinie
+          - bash: echo $(Build.ArtifactStagingDirectory) # nazwa folderu w którym są przechowywane artefakty stworzone w pipelinie (staging directory)
+          - bash: python --version
+          - bash: java --version
+          - bash: node --version
+          - bash: mvn --version
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)'
+              Contents: |
+                **/*.yml
+                **/*.tf
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+
       # - job: SecondJob
       #   steps:
       #     - bash: echo Build SecondJob
