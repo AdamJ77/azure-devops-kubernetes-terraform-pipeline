@@ -10,7 +10,7 @@ stages:
       - job: FirstJob
         steps:
           - bash: echo Build FirstJob
-          - bash: echo $(PipelineVariable)
+          - bash: echo $(PipelineLevelVariable)
           # używanie predefined variables
           - bash: echo $(Build.BuildNumber)
           - bash: echo $(Build.BuildId)
