@@ -32,7 +32,7 @@ stages:
         runOnce: # wszystko uruchamiamy naraz
           deploy:
             steps:
-              - script: echo Deploy to Dev
+              - script: echo Deploy to Dev 1
 
   - stage: QADeploy
     jobs:
