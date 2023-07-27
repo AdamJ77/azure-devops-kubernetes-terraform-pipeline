@@ -12,11 +12,11 @@ stages:
           - bash: echo Build FirstJob
           - bash: echo ${PipelineVariable}
           # używanie predefined variables
-          - bash: echo ${Build.BuildNumber}
-          - bash: echo ${Build.BuildId}
-          - bash: echo ${Build.SourceBranchName}
-          - bash: echo ${System.DefaultWorkingDirectory} # pwd
-          - bash: echo ${Build.ArtifactStagingDirectory} # nazwa folderu w którym są przechowywane artefakty stworzone w pipelinie
+          - bash: echo $(Build.BuildNumber)
+          - bash: echo $(Build.BuildId)
+          - bash: echo $(Build.SourceBranchName)
+          - bash: echo $(System.DefaultWorkingDirectory) # pwd
+          - bash: echo $(Build.ArtifactStagingDirectory) # nazwa folderu w którym są przechowywane artefakty stworzone w pipelinie
       # - job: SecondJob
       #   steps:
       #     - bash: echo Build SecondJob
