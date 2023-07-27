@@ -10,7 +10,7 @@ stages:
       - job: FirstJob
         steps:
           - bash: echo Build FirstJob
-          - bash: echo ${PipelineVariable}
+          - bash: echo $(PipelineVariable)
           # używanie predefined variables
           - bash: echo $(Build.BuildNumber)
           - bash: echo $(Build.BuildId)
@@ -29,7 +29,7 @@ stages:
   #     - job: DevDeployJob
   #       steps:
   #         - bash: echo DevDeployJob
-  #         - bash: echo This is a ${environment} environment
+  #         - bash: echo This is a $(environment) environment
 
   # - stage: QADeploy
   #   variables:
@@ -38,7 +38,7 @@ stages:
   #   jobs:
   #     - job: QADeployJob
   #       steps:
-  #         - bash: echo ${environment}DeployJob
+  #         - bash: echo $(environment)DeployJob
 
   # - stage: ProdDeploy
   #   dependsOn: # musi poczekać aż stage QADeploy i DevDeploy zostaną zakończone
