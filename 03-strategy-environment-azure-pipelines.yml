@@ -2,18 +2,45 @@ trigger:
 - main
 
 
+# # używanie strategy do konfigurowania OS agentów
+# strategy:
+#   matrix: # pozwala na definiowanie wielu konfiguracji/wariacji
+#           # podajemy systemy operacyjne jakich chcemy użyć
+#     linux:
+#       operatingSystem:  ubuntu-latest
+#     mac:
+#       operatingSystem:  macOS-latest
+# pool:
+#   vmImage: $(operatingSystem) # zamiast hardcodować to dajemy zmienną
 
-strategy:
-  matrix: # pozwala na definiowanie wielu konfiguracji/wariacji
-          # podajemy systemy operacyjne jakich chcemy użyć
-    linux:
-      operatingSystem:  ubuntu-latest
-    mac:
-      operatingSystem:  macOS-latest
 
 pool:
-  vmImage: $(operatingSystem) # zamiast hardcodować to dajemy zmienną
+  vmImage: ubuntu-latest
 
-steps:
-- script: echo Running on $(operatingSystem)
-  displayName: 'Run a one-line script'
+stages:
+  - stage: Build
+    jobs:
+      - job: BuildJob
+        steps:
+        - bash: echo Doing the build
+
+  - stage: DevDeploy
+    jobs:
+    - deployment: DevDeployJob # inny rodzaj joba, dający nowe możliwości
+      environment: Dev # nazwa środowiska do jakiego deployment będzie robił deployment xD
+      strategy:  # dla deploymentu możemy użyć strategy (w jaki sposób ma być wykonany deployment)
+        runOnce: # wszystko uruchamiamy naraz
+          deploy:
+            steps:
+              - script: echo Deploy to Dev
+
+  - stage: QADeploy
+    jobs:
+    - deployment: QADeployJob
+      environment: QA 
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - script: echo Deploy to QA
+            
