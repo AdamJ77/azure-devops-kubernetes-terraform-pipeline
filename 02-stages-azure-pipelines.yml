@@ -11,34 +11,40 @@ stages:
         steps:
           - bash: echo Build FirstJob
           - bash: echo ${PipelineVariable}
-      - job: SecondJob
-        steps:
-          - bash: echo Build SecondJob
+          # używanie predefined variables
+          - bash: echo ${Build.BuildNumber}
+          - bash: echo ${Build.BuildId}
+          - bash: echo ${Build.SourceBranchName}
+          - bash: echo ${System.DefaultWorkingDirectory} # pwd
+          - bash: echo ${Build.ArtifactStagingDirectory} # nazwa folderu w którym są przechowywane artefakty stworzone w pipelinie
+      # - job: SecondJob
+      #   steps:
+      #     - bash: echo Build SecondJob
 
-  - stage: DevDeploy
-    variables: # zmienna na poziomie stagu (w tym scopie można ją używać)
-      environment: dev # NAZWA_ZMIENNEJ: WARTOSC
-    dependsOn: Build # dzięki temu możemy zrównoleglić pracę stagy w danych sytuacjach
-    jobs:
-      - job: DevDeployJob
-        steps:
-          - bash: echo DevDeployJob
-          - bash: echo This is a ${environment} environment
+  # - stage: DevDeploy
+  #   variables: # zmienna na poziomie stagu (w tym scopie można ją używać)
+  #     environment: dev # NAZWA_ZMIENNEJ: WARTOSC
+  #   dependsOn: Build # dzięki temu możemy zrównoleglić pracę stagy w danych sytuacjach
+  #   jobs:
+  #     - job: DevDeployJob
+  #       steps:
+  #         - bash: echo DevDeployJob
+  #         - bash: echo This is a ${environment} environment
 
-  - stage: QADeploy
-    variables:
-      environment: QA
-    dependsOn: Build # nie musi czekać na wykonanie stage'a DevDeploy
-    jobs:
-      - job: QADeployJob
-        steps:
-          - bash: echo ${environment}DeployJob
+  # - stage: QADeploy
+  #   variables:
+  #     environment: QA
+  #   dependsOn: Build # nie musi czekać na wykonanie stage'a DevDeploy
+  #   jobs:
+  #     - job: QADeployJob
+  #       steps:
+  #         - bash: echo ${environment}DeployJob
 
-  - stage: ProdDeploy
-    dependsOn: # musi poczekać aż stage QADeploy i DevDeploy zostaną zakończone
-      - QADeploy
-      - DevDeploy
-    jobs:
-      - job: ProdDeployJob
-        steps:
-          - bash: echo ProdDeployJob
+  # - stage: ProdDeploy
+  #   dependsOn: # musi poczekać aż stage QADeploy i DevDeploy zostaną zakończone
+  #     - QADeploy
+  #     - DevDeploy
+  #   jobs:
+  #     - job: ProdDeployJob
+  #       steps:
+  #         - bash: echo ProdDeployJob
