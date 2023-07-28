@@ -1,0 +1,25 @@
+trigger:
+  - main
+
+resources:
+  - repo: self # te z którego korzystamy
+
+variables:
+  tag: "$(Build.BuildId)" # zmienna jako tag i ten tag jest niżej używany jako tag do obrazu Dockera
+
+stages:
+  - stage: Build
+    displayName: Build image
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: ubuntu-latest # obraz Dockera
+        steps:
+          - task: Docker@2 # task dodany przy konfiguracji przez Settings, który buduje obraz na podstawie Dockerfile'a i pushuje go na Docker Hub'a
+            inputs:
+              containerRegistry: "adam11-docker-hub"
+              repository: "adam11/currency-exchange-azure-devops"
+              command: "buildAndPush"
+              Dockerfile: "**/Dockerfile"
+              tags: "$(tag)"
