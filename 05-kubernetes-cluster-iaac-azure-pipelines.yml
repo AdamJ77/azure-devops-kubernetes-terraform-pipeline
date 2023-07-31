@@ -30,10 +30,20 @@ steps:
     backendAzureRmKey: 'kubernetes-dev1.tfstate'
     allowTelemetryCollection: true
 
+# tworzenie klastra K8S na podstawie konfiguracji terraform (.tf)
 - task: TerraformCLI@0
   inputs:
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
     environmentServiceName: 'azure-resource-manager-service-connection'
     commandOptions: '-var client_id=$(client_id) -var client_secret=$(client_secret) -var ssh_public_key=$(publickey.secureFilePath)'
+    allowTelemetryCollection: false
+
+
+# niszczenie klastra (zakomentować jak nie chcemy usuwać !!!)
+- task: TerraformCLI@0
+  inputs:
+    command: 'destroy'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/azure/kubernetes'
+    environmentServiceName: 'azure-resource-manager-service-connection'
     allowTelemetryCollection: false
