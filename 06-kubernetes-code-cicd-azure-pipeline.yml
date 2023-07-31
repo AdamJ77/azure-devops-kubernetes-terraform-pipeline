@@ -1,0 +1,70 @@
+trigger:
+  - main
+
+resources:
+  - repo: self # te z którego korzystamy
+
+variables:
+  tag: 19 #'$(Build.BuildId)' # zmienna jako tag i ten tag jest niżej używany jako tag do obrazu Dockera
+
+stages:
+  # Stage 1
+  - stage: Build
+    displayName: Build image
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: ubuntu-latest # obraz Dockera
+        steps:
+
+          # a) Build Docker image
+          # - task: Docker@2 # task dodany przy konfiguracji przez Settings, który buduje obraz na podstawie Dockerfile'a i pushuje go na Docker Hub'a
+          #   displayName: Build and push an image from a Dockerfile to container registry
+          #   inputs:
+          #     containerRegistry: "adam11-docker-hub"
+          #     repository: "adam11/currency-exchange-azure-devops"
+          #     command: "buildAndPush" # By default, the docker buildAndPush command also publishes the Docker image as a pipeline artifact to the Build.ArtifactStagingDirectory in the Azure DevOps pipeline.
+          #     Dockerfile: "**/Dockerfile"
+          #     tags: "$(tag)"
+          
+          # b) Kopiowanie pliku konfiguracyjnego .yaml do Build.ArtifactStagingDirectory
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)/configuration/kubernetes' # folder główny gdzie mamy source code
+              Contents: '**/*.yaml'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          - bash: ls -R $(Build.ArtifactStagingDirectory) 
+
+  #         # c) Publish Kubernetes configuration file - udostępniamy folder $(Build.ArtifactStagingDirectory) zawierający m. in. plik .yaml, by móc go pobrać w następnym stage'u
+  #         # ale również i docker build jaki zbudowaliśmy wcześniej
+  #         - task: PublishBuildArtifacts@1
+  #           inputs:
+  #             PathtoPublish: '$(Build.ArtifactStagingDirectory)'  # ścieżka lub plik(i) jakie chcemy udostępnić - This directory serves as a staging area before the artifacts are published or made available for further use or deployment in subsequent stages of the pipeline or releases.
+  #             ArtifactName: 'manifest'
+  #             publishLocation: 'Container'
+
+  # # Stage 2
+  # - stage: Deploy
+  #   displayName: Deploy image
+  #   jobs:
+  #     - job: Deploy
+  #       displayName: Deploy
+  #       pool:
+  #         vmImage: ubuntu-latest # obraz Dockera
+  #       steps:
+  #     # a) Pobieramy opublikowany plik konfiguracyjny K8S deployment.yml (o nazwie 'manifest')
+  #       - task: DownloadPipelineArtifact@2
+  #         inputs:
+  #           buildType: 'current'
+  #           artifactName: 'manifest'  # taka sama nazwa jak artefakt jaki zapisaliśmy, dzięki temu wiadomo, który artefakt pobrać
+  #           itemPattern: '**/*.yaml'
+  #           targetPath: '$(System.ArtifactsDirectory)' # gdzie chcemy ściągnąć artefakt(y)
+  #     # b) Deploy to Kubernetes cluster with Docker Image
+  #       - task: KubernetesManifest@1
+  #         inputs:
+  #           action: 'deploy'
+  #           connectionType: 'kubernetesServiceConnection'
+  #           kubernetesServiceConnection: 'azure-kubernetes-connection'
+  #           manifests: '$(System.ArtifactsDirectory)/deployment.yaml' # ścieżka do pliku konfiguracyjnego .yaml, który chcemy zdeployować (czyli do naszego ściągniętego artefaktu)
+  #           containers: 'adam11/currency-exchange-azure-devops:$(tag)'  # jakiego obrazu chcemy użyć
