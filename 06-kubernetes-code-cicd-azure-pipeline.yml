@@ -31,7 +31,7 @@ stages:
           # b) Kopiowanie pliku konfiguracyjnego .yaml do Build.ArtifactStagingDirectory
           - task: CopyFiles@2
             inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)/configuration/kubernetes' # folder główny gdzie mamy source code
+              SourceFolder: '$(System.DefaultWorkingDirectory)' # folder główny gdzie mamy source code
               Contents: '**/*.yaml'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'
           - bash: ls -R $(Build.ArtifactStagingDirectory) 
