@@ -4,10 +4,10 @@
 # terraform-backend-state-in28minutes-123
 # AKIA4AHVNOD7OOO6T4KI
 
-
+# konfiguracja backendu w s3
 terraform {
   backend "s3" {
-    bucket = "mybucket" # Will be overridden from build
+    bucket = "mybucket"       # Will be overridden from build
     key    = "path/to/my/key" # Will be overridden from build
     region = "us-east-1"
   }
@@ -28,26 +28,28 @@ provider "kubernetes" {
   version                = "~> 2.12"
 }
 
-module "in28minutes-cluster" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = "in28minutes-cluster"
-  cluster_version = "1.14"
-  subnets         = ["subnet-3f7b2563", "subnet-4a7d6a45"] #CHANGE
-  #subnets = data.aws_subnet_ids.subnets.ids
-  vpc_id          = aws_default_vpc.default.id
+module "in28minutes-cluster" {                      # korzystamy z modułu by stworzyć klaster k8s
+  source          = "terraform-aws-modules/eks/aws" # moduł udostępniony przez samego Terraforma do stworzenia EKS
+  cluster_name    = "project2-eks-cluster"
+  cluster_version = "1.27"
+  subnets         = ["subnet-0945d29a182b2c243", "subnet-0c4c0437af075b65e"] # wersja statyczna z naszymi podsieciami będącymi w domyślnym VPC
+  # subnets = data.aws_subnet_ids.subnets.ids  # wersja z dynamicznym wyborem podsieci
+  vpc_id = aws_default_vpc.default.id # ustawiamy w jakim VPC ma powstać klaster [w środowisku produkcyjnym normalnie byśmy skorzystali z customowego VPC]
 
   #vpc_id         = "vpc-1234556abcdef"
 
+  # informacje o nodach w klastrze
   node_groups = [
     {
-      instance_type = "t2.micro"
-      max_capacity  = 5
+      instance_type    = "t2.micro"
+      max_capacity     = 5
       desired_capacity = 3
-      min_capacity  = 3
+      min_capacity     = 3
     }
   ]
 }
 
+# data providery
 data "aws_eks_cluster" "cluster" {
   name = module.in28minutes-cluster.cluster_id
 }
@@ -58,12 +60,15 @@ data "aws_eks_cluster_auth" "cluster" {
 
 
 # We will use ServiceAccount to connect to K8S Cluster in CI/CD mode
-# ServiceAccount needs permissions to create deployments 
-# and services in default namespace
+# ServiceAccount needs permissions to create deployments and services in default namespace
+# Ustawiamy pozwolenia dla default service account by miał dostęp do deployments i services
+# chcemy stworzyc pipeline cicd za pomocą którego możemy tworzyć nowe deploymenty i deployować nowe aplikacje
 resource "kubernetes_cluster_role_binding" "example" {
   metadata {
     name = "fabric8-rbac"
   }
+
+  # w środowisku produkcyjnym możemy dać niższe pozwolenia, niekoniecznie admina
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
@@ -78,5 +83,5 @@ resource "kubernetes_cluster_role_binding" "example" {
 
 # Needed to set the default region
 provider "aws" {
-  region  = "us-east-1"
+  region = "us-east-1"
 }
