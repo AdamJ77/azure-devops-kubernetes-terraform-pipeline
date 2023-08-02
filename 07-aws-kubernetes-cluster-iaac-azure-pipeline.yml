@@ -1,0 +1,20 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+# 1. Inicjacja terraforma -> remote backendu w stworzonym s3 (zgodnie z plikiem .tf)
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'aws'
+    command: 'init'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/aws/kubernetes'
+    backendServiceAWS: 'aws-for-terraform'
+    backendAWSBucketName: 'terraform-backend-state-eks-azuredevops-project' # wcześniej stworzony w aws
+    backendAWSKey: 'kubernetes-eks-dev.tfstate'
+# 2. Terraform apply
