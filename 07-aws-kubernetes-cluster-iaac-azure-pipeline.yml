@@ -18,3 +18,9 @@ steps:
     backendAWSBucketName: 'terraform-backend-state-eks-azuredevops-project' # wcześniej stworzony w aws
     backendAWSKey: 'kubernetes-eks-dev.tfstate'
 # 2. Terraform apply
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'aws'
+    command: 'apply'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/configuration/iaac/aws/kubernetes'
+    environmentServiceNameAWS: 'aws-for-terraform'
