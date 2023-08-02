@@ -38,6 +38,8 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
 
   #vpc_id         = "vpc-1234556abcdef"
 
+  cluster_endpoint_public_access = true # to allow connection to the api server
+
   # informacje o nodach w klastrze
   node_groups = [
     {
@@ -59,27 +61,31 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 
-# We will use ServiceAccount to connect to K8S Cluster in CI/CD mode
-# ServiceAccount needs permissions to create deployments and services in default namespace
-# Ustawiamy pozwolenia dla default service account by miał dostęp do deployments i services
-# chcemy stworzyc pipeline cicd za pomocą którego możemy tworzyć nowe deploymenty i deployować nowe aplikacje
-resource "kubernetes_cluster_role_binding" "example" {
-  metadata {
-    name = "fabric8-rbac"
-  }
+//>>Uncomment this section once EKS is created - Start
 
-  # w środowisku produkcyjnym możemy dać niższe pozwolenia, niekoniecznie admina
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "cluster-admin"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = "default"
-    namespace = "default"
-  }
-}
+# # We will use ServiceAccount to connect to K8S Cluster in CI/CD mode
+# # ServiceAccount needs permissions to create deployments and services in default namespace
+# # Ustawiamy pozwolenia dla default service account by miał dostęp do deployments i services
+# # chcemy stworzyc pipeline cicd za pomocą którego możemy tworzyć nowe deploymenty i deployować nowe aplikacje
+# resource "kubernetes_cluster_role_binding" "example" {
+#   metadata {
+#     name = "fabric8-rbac"
+#   }
+
+#   # w środowisku produkcyjnym możemy dać niższe pozwolenia, niekoniecznie admina
+#   role_ref {
+#     api_group = "rbac.authorization.k8s.io"
+#     kind      = "ClusterRole"
+#     name      = "cluster-admin"
+#   }
+#   subject {
+#     kind      = "ServiceAccount"
+#     name      = "default"
+#     namespace = "default"
+#   }
+# }
+
+//>>Uncomment this section once EKS is created - End
 
 # Needed to set the default region
 provider "aws" {
