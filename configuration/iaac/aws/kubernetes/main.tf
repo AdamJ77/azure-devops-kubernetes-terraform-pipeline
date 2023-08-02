@@ -14,7 +14,7 @@ resource "aws_default_vpc" "default" {
 
 }
 
-data "aws_subnet_ids" "subnets" {
+data "aws_subnets" "subnets" {
   vpc_id = aws_default_vpc.default.id
 }
 
@@ -41,6 +41,7 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
 
   # informacje o nodach w klastrze | EKS Managed Node Group(s)
   # Jest to sposób na dostarczanie i zarządzanie worker nodes w klastrze EKS.
+  # Node group - 1 lub więcej instancji EC2, które są deployed na EC2 Auto Scalling group.
 
   eks_managed_node_group_defaults = { # domyślna konifugracja nodami (użyta zostanie jeśli nie będzie nadpisana przez eks_managed_node_groups)
     instance_types = ["t2.small", "t2.medium"]
@@ -54,7 +55,7 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
       max_size     = 10 # maksymalna liczba nodów jaka może być dodana do node groupa
       desired_size = 1
 
-      instance_types = ["t2.small"]
+      instance_types = ["t2.micro"]
     }
   }
 }
