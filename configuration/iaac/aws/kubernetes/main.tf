@@ -31,7 +31,7 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
   source          = "terraform-aws-modules/eks/aws" # moduł udostępniony przez samego Terraforma do stworzenia EKS
   cluster_name    = "project2-eks-cluster"
   cluster_version = "1.27"
-  subnets         = ["subnet-0945d29a182b2c243", "subnet-0c4c0437af075b65e"] # wersja statyczna z naszymi podsieciami będącymi w domyślnym VPC, # Donot choose subnet from us-east-1e
+  subnet_ids      = ["subnet-0945d29a182b2c243", "subnet-0c4c0437af075b65e"] # wersja statyczna z naszymi podsieciami będącymi w domyślnym VPC, # Donot choose subnet from us-east-1e
   # subnets = data.aws_subnet_ids.subnets.ids  # wersja z dynamicznym wyborem podsieci
   vpc_id = aws_default_vpc.default.id # ustawiamy w jakim VPC ma powstać klaster [w środowisku produkcyjnym normalnie byśmy skorzystali z customowego VPC]
 
