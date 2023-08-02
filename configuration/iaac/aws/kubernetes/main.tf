@@ -17,7 +17,7 @@ resource "aws_default_vpc" "default" {
 data "aws_subnets" "subnet_ids" {
   filter { # należy zdefiniować z jakiego VPC mają pochodzić podsieci (bierzemy z VPC domyślnego)
     name   = "vpc-id"
-    values = [aws_default_vpc.default_vpc_value.id]
+    values = [aws_default_vpc.default.id]
   }
 }
 
