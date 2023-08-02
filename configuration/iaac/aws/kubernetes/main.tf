@@ -23,10 +23,10 @@ data "aws_subnets" "subnet_ids" {
 
 provider "kubernetes" {
   //>>Uncomment this section once EKS is created - Start
-  # host                   = data.aws_eks_cluster.cluster.endpoint
-  # cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  # token                  = data.aws_eks_cluster_auth.cluster.token
-  # version                = "~> 2.12"
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+  version                = "~> 2.12"
   //>>Uncomment this section once EKS is created - End
 }
 
@@ -66,13 +66,13 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
 //>>Uncomment this section once EKS is created - Start
 
 # data providery
-# data "aws_eks_cluster" "cluster" {
-#   name = module.in28minutes-cluster.cluster_id
-# }
+data "aws_eks_cluster" "cluster" {
+  name = module.in28minutes-cluster.cluster_id
+}
 
-# data "aws_eks_cluster_auth" "cluster" {
-#   name = module.in28minutes-cluster.cluster_id
-# }
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.in28minutes-cluster.cluster_id
+}
 
 
 
@@ -80,23 +80,24 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
 # # ServiceAccount needs permissions to create deployments and services in default namespace
 # # Ustawiamy pozwolenia dla default service account by miał dostęp do deployments i services
 # # chcemy stworzyc pipeline cicd za pomocą którego możemy tworzyć nowe deploymenty i deployować nowe aplikacje
-# resource "kubernetes_cluster_role_binding" "example" {
-#   metadata {
-#     name = "fabric8-rbac"
-#   }
 
-#   # w środowisku produkcyjnym możemy dać niższe pozwolenia, niekoniecznie admina
-#   role_ref {
-#     api_group = "rbac.authorization.k8s.io"
-#     kind      = "ClusterRole"
-#     name      = "cluster-admin"
-#   }
-#   subject {
-#     kind      = "ServiceAccount"
-#     name      = "default"
-#     namespace = "default"
-#   }
-# }
+resource "kubernetes_cluster_role_binding" "example" {
+  metadata {
+    name = "fabric8-rbac"
+  }
+
+  # w środowisku produkcyjnym możemy dać niższe pozwolenia, niekoniecznie admina
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "default"
+    namespace = "default"
+  }
+}
 
 //>>Uncomment this section once EKS is created - End
 
