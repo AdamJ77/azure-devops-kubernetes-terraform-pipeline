@@ -14,8 +14,11 @@ resource "aws_default_vpc" "default" {
 
 }
 
-data "aws_subnets" "subnets" {
-  vpc_id = aws_default_vpc.default.id
+data "aws_subnets" "subnet_ids" {
+  filter { # należy zdefiniować z jakiego VPC mają pochodzić podsieci (bierzemy z VPC domyślnego)
+    name   = "vpc-id"
+    values = [aws_default_vpc.default_vpc_value.id]
+  }
 }
 
 provider "kubernetes" {
@@ -32,7 +35,7 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
   cluster_name    = "project2-eks-cluster"
   cluster_version = "1.27"
   subnet_ids      = ["subnet-0945d29a182b2c243", "subnet-0c4c0437af075b65e"] # wersja statyczna z naszymi podsieciami będącymi w domyślnym VPC, # Donot choose subnet from us-east-1e
-  # subnets = data.aws_subnet_ids.subnets.ids  # wersja z dynamicznym wyborem podsieci
+  # subnet_ids = data.aws_subnets.subnet_ids.ids  # wersja z dynamicznym wyborem podsieci
   vpc_id = aws_default_vpc.default.id # ustawiamy w jakim VPC ma powstać klaster [w środowisku produkcyjnym normalnie byśmy skorzystali z customowego VPC]
 
   #vpc_id         = "vpc-1234556abcdef"
@@ -41,7 +44,7 @@ module "in28minutes-cluster" {                      # korzystamy z modułu by st
 
   # informacje o nodach w klastrze | EKS Managed Node Group(s)
   # Jest to sposób na dostarczanie i zarządzanie worker nodes w klastrze EKS.
-  # Node group - 1 lub więcej instancji EC2, które są deployed na EC2 Auto Scalling group.
+  # Node group - 1 lub więcej instancji EC2, które są deployed na EC2 Auto Scalling
 
   eks_managed_node_group_defaults = { # domyślna konifugracja nodami (użyta zostanie jeśli nie będzie nadpisana przez eks_managed_node_groups)
     instance_types = ["t2.small", "t2.medium"]
