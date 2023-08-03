@@ -15,7 +15,7 @@ stages:
   - stage: Build
     displayName: Build image
     jobs:
-      - job: Build-Publish-Artifact
+      - job: Build_Publish
         displayName: Build
         pool:
           vmImage: ubuntu-latest
