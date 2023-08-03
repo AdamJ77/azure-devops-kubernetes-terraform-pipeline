@@ -13,7 +13,12 @@ stages:
     jobs:
       - job: FirstJob
         steps:
-          - bash: ls -R $(System.DefaultWorkingDirectory)
+          - bash: ls $(System.DefaultWorkingDirectory)
+  - stage: Stage2
+    jobs:
+      - job: SecJob
+        steps:
+          - bash: ls $(System.DefaultWorkingDirectory)
 
   # - stage: Stage2
   #   jobs:
