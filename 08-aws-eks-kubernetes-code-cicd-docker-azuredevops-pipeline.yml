@@ -1,0 +1,72 @@
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  tag: 14 #'$(Build.BuildId)'
+
+stages:
+# BUILD STAGE
+# - stage: Build
+#   displayName: Build image
+#   jobs:
+#   - job: Build-Publish-Artifact
+#     displayName: Build
+#     pool:
+#       vmImage: ubuntu-latest
+#     steps:
+      # 1. Build and Push a Docker Image with certain tag to Docker Hub repo
+    # - task: Docker@2
+    #   displayName: Build an image
+    #   inputs:
+    #     containerRegistry: 'adam11-docker-hub'
+    #     repository: 'adam11/currency-exchange-azure-devops'
+    #     command: 'buildAndPush'
+    #     Dockerfile: '**/Dockerfile'
+    #     tags: '$(tag)'
+
+      # 2. Copy the YAML files to Staging Directory ??? WHY
+    # - task: CopyFiles@2
+    #   inputs:
+    #     SourceFolder: '$(System.DefaultWorkingDirectory)'
+    #     Contents: '**/*.yaml'
+    #     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      # 3. Publish the Staging Directory so they would be available to deploy stage. ??? WHY ???
+    # - task: PublishBuildArtifacts@1
+    #   inputs:
+    #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    #     ArtifactName: 'config_k8s_file'
+    #     publishLocation: 'Container'
+
+
+# DEPLOY STAGE
+- stage: Deploy
+  displayName: Deploy image
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    #   # 1. Download the artifact
+    # - task: DownloadPipelineArtifact@2
+    #   inputs:
+    #     buildType: 'current'
+    #     artifactName: 'config_k8s_file'
+    #     itemPattern: '**/*.yaml'
+    #     targetPath: '$(System.ArtifactsDirectory)'
+      
+      # 2. Use the image with certain tag to be deployed to k8s cluster, using the yaml artifact file
+    - task: KubernetesManifest@1
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'aws-kubernetes-cluster-service-connection'
+        # manifests: '$(System.ArtifactsDirectory)/configuration/kubernetes/deployment.yaml'
+        manifests: '$(System.DefaultWorkingDirectory)/configuration/kubernetes/deployment.yaml'
+        containers: adam11/currency-exchange-azure-devops:$(tag)
+      #   kubectl apply -f deployment.yaml
+  
