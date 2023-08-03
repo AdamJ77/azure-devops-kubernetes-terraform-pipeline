@@ -1,0 +1,21 @@
+trigger:
+- main
+
+resources:
+  - repo: self # te z którego korzystamy
+
+pool:
+  vmImage: ubuntu-latest
+
+
+stages:
+  - stage: Stage1
+    jobs:
+      - job: FirstJob
+        steps:
+          - bash: ls -R $(System.DefaultWorkingDirectory)
+
+  # - stage: Stage2
+  #   jobs:
+  #     - job: QADeployJob
+
